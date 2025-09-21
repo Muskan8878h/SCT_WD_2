@@ -5,9 +5,17 @@ function Stopwatch() {
   const [isRunning, setIsRunning] = useState(false);
   const [laps, setLaps] = useState([]);
   const intervalRef = useRef(null);
+  const tickAudioRef = useRef(null); // Audio ref
+
+  useEffect(() => {
+    // Initialize audio
+    tickAudioRef.current = new Audio('/tick.mp3'); // path to your tick sound
+    tickAudioRef.current.loop = true; // keep looping while running
+  }, []);
 
   useEffect(() => {
     if (isRunning) {
+      tickAudioRef.current.play(); // start tick sound
       intervalRef.current = setInterval(() => {
         setTime(prevTime => {
           let { minutes, seconds, milliseconds } = prevTime;
@@ -25,6 +33,8 @@ function Stopwatch() {
       }, 10);
     } else {
       clearInterval(intervalRef.current);
+      tickAudioRef.current.pause(); // stop tick sound
+      tickAudioRef.current.currentTime = 0; // reset to start
     }
     return () => clearInterval(intervalRef.current);
   }, [isRunning]);
